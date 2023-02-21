@@ -48,7 +48,11 @@ def update_asset_dict(asset_id: str,asset_hc: int,
     # asset_dict = copy.deepcopy(asset_base_dict)
 
     asset_dict["name"] = asset_id
-    asset_dict["nickname"] = asset_nickname
+    asset_dict["nickname"] = asset_nickname.replace(" ","_")
+    if len(asset_dict["nickname"])>20:
+        print(asset_dict["nickname"])
+        asset_dict["nickname"]=asset_dict["nickname"][0:19]
+        print(asset_dict["nickname"])
     asset_dict["geo_location"] = [ asset_lat,asset_lon]
     asset_dict["city"] = asset_city
     asset_dict["state"] = asset_state
@@ -125,10 +129,12 @@ def add_asset(auth_dict,asset_id: str,
     asset_type,asset_address,asset_zip,asset_city, asset_state,asset_lat,
     asset_lon, city_region, asset_des, asset_yoc,asset_org,asset_floors,asset_nickname,description)
 
+    print(asset_dict)
     response = requests.post(
         f"{ASSET_URL}/assets/",
         headers=auth_dict["headers"],
         data=json.dumps(asset_dict))
+
     if response.status_code != 200:
           raise Exception(f">> Failed to add: {response.status_code} { response.json()}")
     else:
@@ -142,34 +148,39 @@ def iris_asset(all_sites,auth_dict,group_df):
 
   n_assets = len(all_sites["Ledger"])
   print(" * {} assets in file".format(n_assets))
-
+  print(all_sites)
+  # print(p)
   # Data columns to be checked
   site_cols = ["Property Name","Ledger","lat","long","City","State","Address",'ZIP','rentable_sqft','number_of_beds','Construction Type','Year Built','Market','Submarket',"Units"]
 
   for asset_index in range(n_assets):
 
-    asset_type = all_sites["type"][asset_index]
-    asset_lat = float(all_sites["lat"][asset_index])
-    asset_lon = float(all_sites["long"][asset_index])
+    asset_type = "Residential"#all_sites["type"][asset_index]
+    asset_lat = float(all_sites["LATITUDE"][asset_index])
+    asset_lon = float(all_sites["LONGITUDE"][asset_index])
     asset_city = all_sites["City"][asset_index]
     asset_state = all_sites["State"][asset_index]
     asset_country = "USA"
     asset_address = all_sites["Address"][asset_index]
     asset_zip = str(all_sites["ZIP"][asset_index])
-    asset_sqft = int(all_sites["rentable_sqft"][asset_index])
-    asset_hc = int(all_sites["number_of_beds"][asset_index])
+
+    asset_sqft = -1#int(all_sites["rentable_sqft"][asset_index])
+    # asset_hc = int(all_sites["number_of_beds"][asset_index])
+    asset_hc = int(all_sites["Units"][asset_index])
     asset_org = str(all_sites["Submarket"][asset_index])
     city_region = all_sites["Market"][asset_index]
     asset_des = all_sites["Construction Type"][asset_index]
     asset_yoc = int(all_sites["Year Built"][asset_index])
-    asset_floors = int(all_sites["Units"][asset_index])
+    asset_floors = int(all_sites["n Floors"][asset_index])
 
     asset_id = str(all_sites["Property Name"][asset_index])
     asset_nickname = str(all_sites["Property Name"][asset_index])
     iris_id = all_sites["Iris ID"][asset_index]
-    risk_id = all_sites["Risk ID"][asset_index]
+
+    ledger = all_sites["Ledger"][asset_index]
+    # risk_id = all_sites["Risk ID"][asset_index]
     asset_assess_id =all_sites["Assessment ID"][asset_index]
-    description = "Market: "+city_region+" | Submarket: "+asset_org+" | Acquired year: "+str(all_sites["Acquired Year"][asset_index])+" | Construction type: "+asset_des+" | Executive summary: "+all_sites["Executive Summary"][asset_index]#number of buildings
+    description = "Asset: "+asset_nickname+" | Ledger #: "+str(ledger)+" | Address: "+asset_address+ " | Market: "+city_region+" | Submarket: "+asset_org#number of buildings
 
 #-------------------------------------------------------------------------------
               #                      Asset attributes
@@ -184,7 +195,8 @@ def iris_asset(all_sites,auth_dict,group_df):
       iris_id = add_asset(auth_dict,asset_id,asset_hc,asset_sqft,asset_country,asset_type,asset_address,asset_zip,asset_city,asset_state,asset_lat,asset_lon,city_region,asset_des,asset_yoc,asset_org,asset_floors,asset_nickname,description)
 
       print("  2/3 Adding asset to group")
-      append_asset2groups(iris_id,city_region,group_df)
+      print(group_df)
+      append_asset2groups(auth_dict,iris_id,city_region,group_df)
 
       print("  3/3 Initializing risk ratings")
       iris_id_str = str(iris_id)
@@ -198,4 +210,4 @@ def iris_asset(all_sites,auth_dict,group_df):
 
 # Add asset to group portfolio
     add_asset_to_group(auth_dict,iris_id,group_df["group_id"][0])
-    return all_sites
+  return all_sites

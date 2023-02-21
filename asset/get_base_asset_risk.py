@@ -35,6 +35,7 @@ def group_risk_dict_init():
   "display_health_and_wellness": False,
   "display_damage": True,
   "display_aggregate_life_safety": True,
+  "display_hazard_rating": True,
 
  "executive_summary": "Test executive summary",
   "ratings": {
@@ -147,6 +148,7 @@ def risk_dict_init():
   "display_health_and_wellness": False,
   "display_damage": False,
   "display_aggregate_life_safety": False,
+  "display_hazard_rating": True,
 
  "executive_summary": "Test executive summary",
   "ratings": {
@@ -262,6 +264,7 @@ def risk_dict_base():
       "display_health_and_wellness": False,
       "display_damage": False,
       "display_aggregate_life_safety": False,
+      "display_hazard_rating": True,
       "executive_summary": "Test executive summary",
       "assessment_type": "CURRENT",
       "asset_id": "d74f4e5d-1c71-4e8d-b5e4-994d41114460",

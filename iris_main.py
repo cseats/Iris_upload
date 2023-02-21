@@ -35,15 +35,15 @@ print(pd.__version__)
 # print(__name__)
 if __name__ == "__main__":
     print("starting upload")
-    group_update = True
+    group_update = False
     group_risk_rating = False
     group_risk_quant = False
 
     asset_update = False
-    asset_risk_rating = False
+    asset_risk_rating = True
     asset_risk_quant = False
 
-    write_Results = False
+    write_Results = True
     OUTPUT_FOLDER = "outputs"
 
 
@@ -67,10 +67,17 @@ if __name__ == "__main__":
 # Fxn to bring in upload csv (select file if time)
     dir_path = os.path.dirname(os.path.realpath(__file__))
     INPUT_PATH = "inputs\\eqr_iris_upload_full.xlsx"
+    INPUT_PATH = "inputs\\AllSites_scripted.xlsx"
     asset_sheet = "upload"
+    asset_sheet = "2.1 to_iris"
     group_sheet = "groups"
-    all_sites, all_groups = iris_upload_input.iris_upload_input(INPUT_PATH,dir_path,asset_sheet,group_sheet)
 
+    risk_rating_sheet = "risk_ratings"
+    all_sites, all_groups, risk_rating_dict = iris_upload_input.iris_upload_input(INPUT_PATH,dir_path,asset_sheet,group_sheet,risk_rating_sheet)
+
+    print("________________________________________________")
+    print(all_sites)
+    print("________________________________________________")
 #_______________________________________________________________________________
 # Add or update Groups
     if group_update:
@@ -92,35 +99,55 @@ if __name__ == "__main__":
     if asset_update:
         # asset_base_dict = get_base_asset.get_base_asset_dict()
         print("Uploading/updating assets...\n")
+        risk_len = len(list(risk_rating_dict.keys()))
         all_sites = iris_asset.iris_asset(all_sites,auth_dict,group_df)
         print("Assets updated.\n")
+        print("************************")
+        print(all_sites)
 # Add or update asset risk ratings (specify if quantitative ratings are wanted)
     if asset_risk_rating:
         #dictionary calling out the GROUOP hazards their consequences and the csv headers of the consequence risk ratings
-        print("Uploading/updating asset risk ratings...\n")
-        asset_hazard_conseq = {"geophysical_seismic":[{"economic_loss":"Seismic Risk"}],
-                               "climatological_wildfire":[{"economic_loss":"Wildfire Risk"}],
-                               "hydrological_stormwater_flooding":[{"economic_loss":"Flood Risk"}],
-                               "hydrological_riverine_flooding":[{"economic_loss":"Flood Risk"}],
-                               "hydrological_coastal_flooding_and_sea_level_rise":[{"economic_loss":"Flood Risk"}],
-                               "climatological_extreme_heat":[{"economic_loss":"Extreme Heat Risk"}]}
+        c = 0
+        for y in risk_rating_dict:
+            c+=1
+            print("************************")
+            print("Starting the next assessment post\n")
+            if risk_rating_dict[y]["RCP"] == "Current":
 
-        assessment_type = {"version":1,  "rcp_scenario": "8.5","time_horizon": "2100","assessment_type": "FUTURE"}
-        _risk_key = "Risk ID 1"
-        all_sites = asset_risk.asset_risk(all_sites,asset_hazard_conseq,auth_dict,assessment_type,_risk_key)
+                assessment_type = {"version":c,"assessment_type": "CURRENT"}
+
+            else:
+                assessment_type = {"version":c,  "rcp_scenario": str(risk_rating_dict[y]["RCP"]),"time_horizon": str(y),"assessment_type": "FUTURE"}
+
+            # assessment_type = {"version":c,  "rcp_scenario": "8.5","time_horizon": str(y),"assessment_type": "FUTURE"}
+
+            print("Uploading/updating asset risk ratings...\n")
+            asset_hazard_conseq = {"geophysical_seismic":[{"economic_loss":"Seismic Risk"}],
+                                   "climatological_wildfire":[{"economic_loss":"Wildfire Risk"}],
+                                   "hydrological_stormwater_flooding":[{"economic_loss":"Flood Risk"}],
+                                   "hydrological_riverine_flooding":[{"economic_loss":"Flood Risk"}],
+                                   "hydrological_coastal_flooding_and_sea_level_rise":[{"economic_loss":"Flood Risk"}],
+                                   "climatological_extreme_heat":[{"economic_loss":"Extreme Heat Risk"}]}
+
+
+
+            # assessment_type = {"version":1,  "rcp_scenario": "8.5","time_horizon": "2100","assessment_type": "FUTURE"}
+            _risk_key = "Risk ID "+str(c)
+
+            all_sites = asset_risk.asset_risk(all_sites,risk_rating_dict[y]["risk_ratings"],auth_dict,assessment_type,_risk_key)
 
 #_______________________________________________________________________________
 
-        asset_hazard_conseq = {"geophysical_seismic":[{"economic_loss":"Seismic Risk"}],
-                               "climatological_wildfire":[{"economic_loss":"Wildfire Risk"}],
-                               "hydrological_stormwater_flooding":[{"economic_loss":"Flood Risk"}],
-                               "hydrological_riverine_flooding":[{"economic_loss":"Flood Risk"}],
-                               "hydrological_coastal_flooding_and_sea_level_rise":[{"economic_loss":"Flood Risk"}],
-                               "climatological_extreme_heat":[{"economic_loss":"Extreme Heat Risk"}]}
-
-        assessment_type = {"version":2,"assessment_type": "CURRENT"}
-        _risk_key = "Risk ID 2"
-        all_sites = asset_risk.asset_risk(all_sites,asset_hazard_conseq,auth_dict,assessment_type,_risk_key)
+        # asset_hazard_conseq = {"geophysical_seismic":[{"economic_loss":"Seismic Risk"}],
+        #                        "climatological_wildfire":[{"economic_loss":"Wildfire Risk"}],
+        #                        "hydrological_stormwater_flooding":[{"economic_loss":"Flood Risk"}],
+        #                        "hydrological_riverine_flooding":[{"economic_loss":"Flood Risk"}],
+        #                        "hydrological_coastal_flooding_and_sea_level_rise":[{"economic_loss":"Flood Risk"}],
+        #                        "climatological_extreme_heat":[{"economic_loss":"Extreme Heat Risk"}]}
+        #
+        # assessment_type = {"version":2,"assessment_type": "CURRENT"}
+        # _risk_key = "Risk ID 2"
+        # all_sites = asset_risk.asset_risk(all_sites,asset_hazard_conseq,auth_dict,assessment_type,_risk_key)
 
 
         print("Risk ratings updated.\n")

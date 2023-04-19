@@ -21,7 +21,7 @@ def get_auth(env,dir_path):
         HAZARD_URL = "https://hazard.iris.arup.com"
 
 
-    ASSET_URL = "https://asset.test.iris.arup.com"
-    HAZARD_URL = "https://hazard.test.iris.arup.com"
+    # ASSET_URL = "https://asset.test.iris.arup.com"
+    # HAZARD_URL = "https://hazard.test.iris.arup.com"
     header = {'accept': 'application/json', 'authorization': f'Bearer {_bearer}'}
     return ASSET_URL,HAZARD_URL,header

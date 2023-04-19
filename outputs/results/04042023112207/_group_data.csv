@@ -1,0 +1,13 @@
+,group_id,group_name,group_des,group_risk_id
+0,c63a6544-518d-4704-aeb9-d67ad556f17b,New York - Manhattan,Market,
+1,59c48086-c4fd-4499-8015-8c504af16f9f,Washington DC,Market,
+2,38f9327a-2511-49c3-bb64-81bcefb1e6b8,Los Angeles,Market,
+3,cf2e24d5-b38a-46dd-af59-3fe7b5b3751e,Seattle,Market,
+4,d568b1d9-5f52-4eb2-a8b9-19962ef21f70,Denver,Market,
+5,64b03376-fe43-4aac-8097-29c0ae55cf6e,San Francisco Bay Area,Market,
+6,3f6657f4-c6b1-4957-ab3c-40e4f96416f3,Atlanta,Market,
+7,51b4f717-634a-491e-abc3-e78339e7b9c9,Austin,Market,
+8,4bf45691-33e6-4dd5-be3f-7bde46112d3d,Dallas/Ft. Worth,Market,
+9,bd9a5be3-5fa1-4207-8e0a-18ab112d282c,San Diego,Market,
+10,b4c207c0-761f-49f4-a656-cf43a83254ff,Orange County,Market,
+11,22af78d4-01c0-4ff2-a906-7bde42be2bed,EQR Portfolio,Portfolio,

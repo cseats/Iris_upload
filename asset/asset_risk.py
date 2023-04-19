@@ -10,10 +10,13 @@ def asset_risk_post(base_risk_dict,auth_dict,all_sites,asset_indx,_risk_key,vers
     print("")
     HAZARD_URL = auth_dict["hazard_url"]
     print(all_sites[_risk_key][asset_indx])
+    print("____________________________________________")
     print(base_risk_dict)
     print("____________________________________________")
+
     if all_sites[_risk_key][asset_indx] != all_sites[_risk_key][asset_indx]: #if there is no risk rating
       print(f"Risk rating has not been created yet, adding rating now...")
+
       response = requests.post(
           f"{HAZARD_URL}/risk-ratings/",
           headers=auth_dict["headers"],
@@ -84,16 +87,21 @@ def asset_risk(all_sites,asset_hazard_conseq,auth_dict,assessment_type,_risk_key
         print(" ")
 
         for haz in asset_hazard_conseq.keys():
-            print(haz)
+           
+            print("_________________________________________")
+            print(asset_hazard_conseq[haz]["haz_name"])
             print(asset_hazard_conseq)
-            print(all_sites[asset_hazard_conseq[haz]["haz_name"]][asset_indx])
-            # print(_o)
+            print(asset_hazard_conseq[haz]["summary"])
+            print("_________________________________________")
+           
             haz_dict[haz]={
             "negligible": True,
             "further_analysis_needed": False,
-            "further_analysis_explanation": None,
-            "assessment_update": None,
-            "hazard_source": "MunichRe",
+            "further_analysis_explanation": "",
+            "assessment_update": "6 months",
+            "hazard_source": "",
+            "methodology":"",
+            "summary": all_sites[asset_hazard_conseq[haz]["summary"]][asset_indx],
             "hazard_rating": {
                 "confidence": 0,
                 "risk_rating": all_sites[asset_hazard_conseq[haz]["haz_name"]][asset_indx],
@@ -103,15 +111,15 @@ def asset_risk(all_sites,asset_hazard_conseq,auth_dict,assessment_type,_risk_key
       }}
 
             for consq in asset_hazard_conseq[haz]:
-
-                data_frame_key = asset_hazard_conseq[haz][consq]  #[list(consq.keys())[0]]
-                print("Hazard: "+haz+"  | Consequence: "+consq+"  | Rating: "+all_sites[data_frame_key][asset_indx])
-                haz_dict[haz][consq] = {
-                                            "confidence": 0,
-                                            "risk_rating": all_sites[data_frame_key][asset_indx],
-                                            "apetite": "",
-                                            "likelihood": "",
-                                            "consequence": ""}
+                if consq !="summary":
+                    data_frame_key = asset_hazard_conseq[haz][consq]  #[list(consq.keys())[0]]
+                    print("Hazard: "+haz+"  | Consequence: "+consq+"  | Rating: "+all_sites[data_frame_key][asset_indx])
+                    haz_dict[haz][consq] = {
+                                                "confidence": 0,
+                                                "risk_rating": all_sites[data_frame_key][asset_indx],
+                                                "apetite": "",
+                                                "likelihood": "",
+                                                "consequence": ""}
 
         base_risk_dict["ratings"] = haz_dict
         base_risk_dict["asset_id"] = all_sites["Iris ID"][asset_indx]
@@ -122,14 +130,15 @@ def asset_risk(all_sites,asset_hazard_conseq,auth_dict,assessment_type,_risk_key
 
             base_risk_dict["name"] = assessment_type["assessment_type"] + " Scenario"
         else:
-            base_risk_dict["name"] = assessment_type["assessment_type"] + " Scenario RCP"+assessment_type["rcp_scenario"]+" "+ assessment_type["time_horizon"]
+            base_risk_dict["name"] = "RCP"+assessment_type["rcp_scenario"]+" "+ assessment_type["time_horizon"]
 
 
         for keys in list(assessment_type.keys()):
             base_risk_dict[keys] = assessment_type[keys]
 
         version_ = assessment_type["version"]
+        base_risk_dict["version"] = 1
         all_sites[_risk_key][asset_indx] = asset_risk_post(base_risk_dict,auth_dict,all_sites,asset_indx,_risk_key,version_)
-        print(" ")
+    
 
     return all_sites

@@ -190,7 +190,7 @@ def iris_asset(all_sites,auth_dict,group_df):
   site_cols = ["Property Name","Ledger","lat","long","City","State","Address",'ZIP','rentable_sqft','number_of_beds','Construction Type','Year Built','Market','Submarket',"Units"]
 
   for asset_index in range(n_assets):
-
+#------------------------------------------------------------------------------- CSV COL HEADS #-------------------------------------------------------------------------------
     asset_type = "Residential"#all_sites["type"][asset_index]
     asset_lat = float(all_sites["LATITUDE"][asset_index])
     asset_lon = float(all_sites["LONGITUDE"][asset_index])
